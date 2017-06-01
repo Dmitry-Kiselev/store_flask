@@ -25,7 +25,7 @@ class UserRegistrationView(MethodView):
                         form.password.data)
             db_session.add(user)
             flash('Thanks for registering')
-            return redirect(url_for('login'))
+            return redirect(url_for('users.login'))
         return render_template(self.template_name, form=form)
 
 
