@@ -32,10 +32,7 @@ class UserRegistrationView(MethodView):
 
 class UserLoginView(MethodView):
     form_class = UserLoginForm
-    template_name = 'users/sign_up.html'
-
-    def dispatch_request(self, **kwargs):
-        return render_template(self.template_name, **kwargs)
+    template_name = 'users/login.html'
 
     def get(self):
         form = self.form_class()

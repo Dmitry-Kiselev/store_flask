@@ -1,13 +1,14 @@
 {% extends 'base.html' %}
 
-{% load bootstrap %}
 
 {% block title %}Log in{% endblock %}
 
 {% block content %}
     <form method="post" action="">
-    {% csrf_token %}
-    {{ form|bootstrap }}
+        {% from "_formhelpers.html" import render_field %}
+    {{ csrf_token }}
+    {{ render_field(form.username) }}
+    {{ render_field(form.password) }}
     <button type="submit" class="btn btn-primary" id="submit">Submit</button>
     </form>
 
