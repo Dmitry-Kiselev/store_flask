@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% load bootstrap %}
+{% load static %}
+
+{% block title %}Profile update{% endblock %}
+
+{% block extrastyle %}
+    <link href="{% static 'css/profile_style.css' %}" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+    <div id="map"></div>
+    <br>
+    <form method="post" action="{{ request.path }}">
+        {% csrf_token %}
+        {{ form|bootstrap }}
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+
+
+{% endblock %}
+
+{% block extrajs %}
+    <script src="{% static 'js/maps.js' %}"></script>
+    <script async defer
+            src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAtxN9qkWRVPo6mAwQZnIYArg7c6EKUdMo&callback=initMap">
+    </script>
+{% endblock %}
+
