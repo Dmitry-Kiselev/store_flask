@@ -6,14 +6,18 @@ from database import configure_db, db
 from extensions import login_manager
 from users.models import User, AnonymousUser
 from users.views import users
+from catalogue.views import catalogue
 
 
 def configure_blueprints(app):
     app.register_blueprint(users, url_prefix='/auth')
+    app.register_blueprint(catalogue, url_prefix='/')
 
 
 def create_app():
     app = Flask(__name__)
+    configure_db(app)
+    db.init_app(app)
     Bootstrap(app)
     configure_blueprints(app)
     configure_admin_views(app)
@@ -24,9 +28,7 @@ def create_app():
 
 
 app = create_app()
-db.init_app(app)
 login_manager.init_app(app)
-configure_db(app)
 
 
 @login_manager.user_loader
@@ -41,5 +43,4 @@ def load_user(user_id):
 login_manager.anonymous_user = AnonymousUser
 
 if __name__ == '__main__':
-    db.create_all()
     app.run(debug=True)
