@@ -1,27 +1,25 @@
-import datetime
-
 from flask import url_for
 from flask_login import UserMixin, AnonymousUserMixin
-from sqlalchemy import Column, Integer, String, Float, Boolean, DateTime
 
-from database import Base
+from database import db
+import datetime
 
 
-class User(Base, UserMixin):
+class User(db.Model, UserMixin):
     __tablename__ = "users"
 
-    id = Column(Integer, primary_key=True)
-    username = Column(String(200), unique=True, nullable=False)
-    email = Column(String(200), unique=True, nullable=False)
-    password = Column('password', String(120), nullable=False)
-    date_joined = Column(DateTime(timezone=True),
-                         default=datetime.datetime.now,
-                         nullable=False)
-    address = Column(String(100), nullable=True)
-    address_lat = Column(Float, nullable=True)
-    address_lng = Column(Float, nullable=True)
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(200), unique=True, nullable=False)
+    email = db.Column(db.String(200), unique=True, nullable=False)
+    password = db.Column('password', db.String(120), nullable=False)
+    date_joined = db.Column(db.DateTime(timezone=True),
+                            default=datetime.datetime.now,
+                            nullable=False)
+    address = db.Column(db.String(100), nullable=True)
+    address_lat = db.Column(db.Float, nullable=True)
+    address_lng = db.Column(db.Float, nullable=True)
 
-    authenticated = Column(Boolean, default=False)
+    authenticated = db.Column(db.Boolean, default=False)
 
     def __init__(self, username, email, password):
         super(User, self).__init__()
