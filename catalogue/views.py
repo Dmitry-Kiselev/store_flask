@@ -1,12 +1,12 @@
-from .models import Category, Product
-from flask_generic_views import TemplateView, RedirectView
-from flask import Blueprint
+from flask import Blueprint, render_template
 
+from .models import Category, Product
 
 catalogue = Blueprint("catalogue", __name__)
 
-index = TemplateView.as_view('index', template_name='catalogue/index.html')
 
-catalogue.add_url_rule('/', view_func=index,  defaults={
-    #'categories': Category.query.all(), 'products': Product.query.all()
-})
+@catalogue.route("/")
+def index():
+    return render_template('catalogue/index.html',
+                           categories=Category.query.all(),
+                           products=Product.query.all())
