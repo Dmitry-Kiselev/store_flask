@@ -1,3 +1,4 @@
+from flask import url_for
 from sqlalchemy_mptt.mixins import BaseNestedSets
 
 from database import db
@@ -29,6 +30,9 @@ class Product(TimeStampedModel):
     description = db.Column(db.Text(), nullable=True)
     price = db.Column(db.DECIMAL())
     num_in_stock = db.Column(db.DECIMAL())
+
+    def get_absolute_url(self):
+        return url_for('catalogue.product_detail', product_id=self.id)
 
     def __str__(self):
         return '<Product {}>'.format(self.name)
