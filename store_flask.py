@@ -1,10 +1,11 @@
 from flask import Flask
 from flask_bootstrap import Bootstrap
 
+from admin.views import configure_admin_views
+from database import configure_db, db
 from extensions import login_manager
 from users.models import User, AnonymousUser
 from users.views import users
-from database import configure_db, db
 
 
 def configure_blueprints(app):
@@ -15,6 +16,7 @@ def create_app():
     app = Flask(__name__)
     Bootstrap(app)
     configure_blueprints(app)
+    configure_admin_views(app)
 
     app.secret_key = 'super secret key'
 
@@ -35,13 +37,9 @@ def load_user(user_id):
     else:
         return None
 
+
 login_manager.anonymous_user = AnonymousUser
 
-
-@app.route('/')
-def hello_world():
-    return 'Hello World!'
-
-
 if __name__ == '__main__':
+    db.create_all()
     app.run(debug=True)
