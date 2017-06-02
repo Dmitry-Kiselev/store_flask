@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+
+{% block title %}Basket{% endblock %}
+
+{% block content %}
+    <ul>
+        {% for line in lines %}
+            <li>
+                <a href="{{ line.product.get_absolute_url() }}">{{ line.product.name }}</a>
+            </li>
+        {% endfor %}
+    </ul>
+{% endblock %}

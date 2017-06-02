@@ -21,6 +21,8 @@ class User(db.Model, UserMixin):
 
     authenticated = db.Column(db.Boolean, default=False)
 
+    basket = db.relationship("Basket", backref='basket', lazy='dynamic')
+
     def __init__(self, username, email, password):
         super(User, self).__init__()
         self.username = username
@@ -50,6 +52,10 @@ class User(db.Model, UserMixin):
 
     def __str__(self):
         return "<{} {}>".format(self.__class__.__name__, self.username)
+
+    @property
+    def get_basket(self):
+        return self.basket.query.filter(is_submitted=False).first()
 
 
 class AnonymousUser(AnonymousUserMixin):

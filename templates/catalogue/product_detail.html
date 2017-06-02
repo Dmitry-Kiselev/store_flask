@@ -5,4 +5,16 @@
 {% block content %}
     {{ product.name }}
     {{ product.description }}
+    <div class="btn-group cart">
+        <form action="{{ url_for('') }}" method="post">
+            {{ csrf_token }}
+            <input type="text" name="id"
+                   value="{{ product.id }}" hidden/>
+            <button type="submit" class="btn btn-success"
+                    {% if not current_user.is_authenticated %}disabled="disabled"{% endif %}>
+                Add to cart
+            </button>
+        </form>
+
+    </div>
 {% endblock %}
