@@ -2,11 +2,11 @@ from flask import Flask
 from flask_bootstrap import Bootstrap
 
 from admin.views import configure_admin_views
-from database import configure_db, db
+from catalogue.views import catalogue
+from database import db
 from extensions import login_manager
 from users.models import User, AnonymousUser
 from users.views import users
-from catalogue.views import catalogue
 
 
 def configure_blueprints(app):
@@ -16,7 +16,7 @@ def configure_blueprints(app):
 
 def create_app():
     app = Flask(__name__)
-    configure_db(app)
+    app.config.from_object('config.DevelopmentConfig')
     db.init_app(app)
     Bootstrap(app)
     configure_blueprints(app)
