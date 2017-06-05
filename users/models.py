@@ -1,4 +1,5 @@
 import datetime
+import hashlib
 from math import radians, sin, cos, atan2, sqrt
 
 from flask import url_for
@@ -33,7 +34,7 @@ class User(db.Model, UserMixin):
         super(User, self).__init__()
         self.username = username
         self.email = email
-        self.password = password
+        self.password = self.set_password(password)
 
     def is_active(self):
         """True, as all users are active."""
@@ -107,6 +108,12 @@ class User(db.Model, UserMixin):
         now = datetime.datetime.now()
         return Discount.query.filter(Discount.available_from <= now,
                                      Discount.available_until >= now).count()
+
+    def set_password(self, password):
+        self.password = hashlib.md5(password.encode())
+
+    def check_password(self, password):
+        return self.password == hashlib.md5(password.encode())
 
 
 class AnonymousUser(AnonymousUserMixin):

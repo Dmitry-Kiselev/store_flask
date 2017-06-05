@@ -42,7 +42,7 @@ class UserLoginView(MethodView):
         if form.validate():
             user = User.query.filter_by(username=form.username.data).first()
             if user:
-                if user.password == form.password.data:
+                if user.check_password(form.password.data):
                     user.authenticated = True
                     db.session.add(user)
                     db.session.commit()
