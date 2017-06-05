@@ -1,9 +1,11 @@
 import datetime
+from math import radians, sin, cos, atan2, sqrt
 
 from flask import url_for
 from flask_login import UserMixin, AnonymousUserMixin
 
 from basket.models import Basket
+from config import ShippingConfig
 from database import db
 from order.models import Discount
 
@@ -74,6 +76,32 @@ class User(db.Model, UserMixin):
         if active_discounts:
             return active_discounts[0]
         return None
+
+    @property
+    def distance(self):
+        company_lat, company_lng = ShippingConfig.address_lat, ShippingConfig.address_lng
+        user_lat, user_lng = self.address_lat, self.address_lng
+
+        if not (company_lat and company_lng and user_lat and user_lng):
+            return None
+
+        # approximate radius of earth in km
+        R = 6373.0
+
+        lat1 = radians(company_lat)
+        lon1 = radians(company_lng)
+        lat2 = radians(user_lat)
+        lon2 = radians(user_lng)
+
+        dlon = lon2 - lon1
+        dlat = lat2 - lat1
+
+        a = sin(dlat / 2) ** 2 + cos(lat1) * cos(lat2) * sin(dlon / 2) ** 2
+        c = 2 * atan2(sqrt(a), sqrt(1 - a))
+
+        distance = R * c
+
+        return distance
 
     def has_discount(self):
         # TODO: implement discounts

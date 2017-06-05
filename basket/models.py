@@ -1,8 +1,10 @@
 from decimal import Decimal
 
+from flask_login import current_user
+
 from catalogue.models import Product
+from config import ShippingConfig
 from database import db
-# from users.models import User
 
 
 class Basket(db.Model):
@@ -25,31 +27,35 @@ class Basket(db.Model):
 
     @property
     def shipping_price(self):
-        # TODO: implement shipping price calculation
-        return Decimal(30.00)  # for now
+        if self.total_price_inc_discount > ShippingConfig.free_shipping_on:
+            return 0  # free shipping
+
+        distance = current_user.distance
+        if distance is None:
+            return ShippingConfig.fixed_shipping_price  # fixed price
+
+        return Decimal(distance) * ShippingConfig.shipping_price_per_km
 
     @property
     def total_price_inc_discount(self):
-        return self.total_price
-        # user = User.query.get(self.user_id)
-        # if not user.has_discount():
-        #     return self.total_price
-        #
-        # discount = user.get_discount()
-        #
-        # if discount.in_percent:
-        #     price = self.total_price * ((100 - discount.value) / 100)
-        #     return price if price >= 0 else 0
-        # else:
-        #     price = self.total_price - discount.value
-        #     return price if price >= 0 else 0
+        if not current_user.has_discount():
+            return self.total_price
+
+        discount = current_user.get_discount()
+
+        if discount.in_percent:
+            price = self.total_price * ((100 - discount.value) / 100)
+            return price if price >= 0 else 0
+        else:
+            price = self.total_price - discount.value
+            return price if price >= 0 else 0
 
     @property
     def total_incl_discount_incl_shipping(self):
         return self.total_price_inc_discount + self.shipping_price
 
     def __str__(self):
-        return 'Basket {}'.format(self.user.username)
+        return 'Basket {}'.format(self.id)
 
 
 class Line(db.Model):

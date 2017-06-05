@@ -16,7 +16,7 @@ class Payment(db.Model):
         self.order_id = kwargs.get('order_id')
 
         if self.order_id:
-            order = Order.qury.get(self.order_id)
+            order = Order.query.get(self.order_id)
             self.charged_sum = order.total_price
             self.discount_sum = order.get_discount_val
             if self.charge_id:
