@@ -1,4 +1,4 @@
-from wtforms import Form, StringField, PasswordField, validators
+from wtforms import Form, StringField, PasswordField, validators, FloatField
 
 
 class RegistrationForm(Form):
@@ -16,3 +16,9 @@ class UserLoginForm(Form):
     password = PasswordField('Password', [
         validators.DataRequired(),
     ])
+
+
+class UserProfileForm(Form):
+    address = StringField('Address')
+    address_lat = FloatField()
+    address_lng = FloatField()

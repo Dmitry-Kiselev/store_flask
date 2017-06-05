@@ -4,7 +4,7 @@ from flask_login import login_required, current_user, logout_user, login_user
 
 from database import db
 from users.models import User
-from .forms import RegistrationForm, UserLoginForm
+from .forms import RegistrationForm, UserLoginForm, UserProfileForm
 
 users = Blueprint("users", __name__)
 
@@ -51,6 +51,26 @@ class UserLoginView(MethodView):
         return render_template(self.template_name, form=form)
 
 
+class UserProfileView(MethodView):
+    form_class = UserProfileForm
+    template_name = 'users/profile.html'
+
+    def get(self):
+        form = self.form_class()
+        return render_template(self.template_name, form=form)
+
+    def post(self):
+        form = self.form_class(request.form)
+        if form.validate():
+            current_user.address = form.address.data
+            current_user.address_lat = form.address_lat.data
+            current_user.address_lng = form.address_lng.data
+            db.session.commit()
+            flash('Profile updated')
+            return redirect('/')
+        return render_template(self.template_name, form=form)
+
+
 @login_required
 def logout():
     """Logout the current user."""
@@ -65,4 +85,5 @@ def logout():
 users.add_url_rule("/sign_up/",
                    view_func=UserRegistrationView.as_view('sign_up'))
 users.add_url_rule("/login/", view_func=UserLoginView.as_view('login'))
+users.add_url_rule("/profile/", view_func=UserProfileView.as_view('profile'))
 users.add_url_rule("/logout/", view_func=UserRegistrationView.as_view('logout'))
