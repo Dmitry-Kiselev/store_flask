@@ -71,8 +71,8 @@ class User(db.Model, UserMixin):
     @property
     def discount(self):
         active_discounts = [x for x in
-                            Discount.query.filter_by(owner_id=self.id) if
-                            x.active]
+                            self.discounts if
+                            x.is_active()]
         if active_discounts:
             return active_discounts[0]
         return None
@@ -104,8 +104,9 @@ class User(db.Model, UserMixin):
         return distance
 
     def has_discount(self):
-        # TODO: implement discounts
-        return False
+        now = datetime.datetime.now()
+        return Discount.query.filter(Discount.available_from <= now,
+                                     Discount.available_until >= now).count()
 
 
 class AnonymousUser(AnonymousUserMixin):

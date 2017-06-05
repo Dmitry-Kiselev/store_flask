@@ -28,6 +28,9 @@ class OrderCreateView(MethodView):
             order = Order(basket_id=basket.id, discount_id=discount_id)
             basket.submit()
 
+            db.session.add(order)
+            db.session.commit()
+
             number = form.number.data
             exp_month = form.expiration_month.data
             exp_year = form.expiration_year.data

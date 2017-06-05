@@ -1,6 +1,6 @@
 import datetime
-
 from decimal import Decimal
+
 from sqlalchemy_utils.types.choice import ChoiceType
 
 from basket.models import Basket
@@ -26,12 +26,12 @@ class Order(db.Model):
     basket_id = db.Column(db.Integer, db.ForeignKey('baskets.id'))
     status = db.Column(db.SmallInteger, ChoiceType(ORDER_STATUS.STATUS_CHOICES),
                        default=ORDER_STATUS.PENDING)
-    discount_id = db.Column(db.Integer, db.ForeignKey('discounts.id'), nullable=True)
+    discount_id = db.Column(db.Integer, db.ForeignKey('discounts.id'),
+                            nullable=True)
 
     def __init__(self, basket_id, discount_id):
         self.basket_id = basket_id
         self.discount_id = discount_id
-
 
     @property
     def total_price(self):
@@ -49,14 +49,16 @@ class Order(db.Model):
 
     @property
     def get_discount_val(self):
-        if not self.discount:
+        if not self.discount_id:
             return 0
-        if self.discount.in_percent:
-            return self.basket.total_price - (
-                self.basket.total_price * Decimal((100 - self.discount.value) / 100))
+        discount = Discount.query.get(self.discount_id)
+        basket = Basket.query.get(self.basket_id)
+        if discount.in_percent:
+            return basket.total_price - (
+                basket.total_price * Decimal((100 - discount.value) / 100))
         else:
-            return self.basket.total_price - (
-                self.basket.total_price - self.discount.value)
+            return basket.total_price - (
+                basket.total_price - discount.value)
 
     def get_status(self):
         return dict(Order.ORDER_STATUS.STATUS_CHOICES)[self.status]
@@ -73,7 +75,7 @@ class Discount(db.Model):
 
     def is_active(self):
         now = datetime.datetime.now()
-        return self.available_from >= now and self.available_until <= now
+        return self.available_from <= now and self.available_until >= now
 
     def mark_as_used(self):
         self.is_used = True

@@ -41,7 +41,7 @@ class Basket(db.Model):
         if not current_user.has_discount():
             return self.total_price
 
-        discount = current_user.get_discount()
+        discount = current_user.discount
 
         if discount.in_percent:
             price = self.total_price * ((100 - discount.value) / 100)
