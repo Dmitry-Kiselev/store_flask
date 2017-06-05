@@ -3,8 +3,9 @@ from flask_admin.contrib.sqla import ModelView
 
 from catalogue.models import Product, Category
 from database import db
-from users.models import User
+from order.models import Discount
 from payment.models import Payment
+from users.models import User
 
 
 def configure_admin_views(app):
@@ -13,3 +14,4 @@ def configure_admin_views(app):
     admin.add_view(ModelView(Product, db.session))
     admin.add_view(ModelView(Category, db.session))
     admin.add_view(ModelView(Payment, db.session))
+    admin.add_view(ModelView(Discount, db.session))
