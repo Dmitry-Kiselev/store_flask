@@ -1,5 +1,8 @@
-from database import db
+from decimal import Decimal
+
 from catalogue.models import Product
+from database import db
+# from users.models import User
 
 
 class Basket(db.Model):
@@ -16,6 +19,34 @@ class Basket(db.Model):
     @property
     def lines_count(self):
         return self.lines.count()
+
+    def submit(self):
+        self.is_submitted = True
+
+    @property
+    def shipping_price(self):
+        # TODO: implement shipping price calculation
+        return Decimal(30.00)  # for now
+
+    @property
+    def total_price_inc_discount(self):
+        return self.total_price
+        # user = User.query.get(self.user_id)
+        # if not user.has_discount():
+        #     return self.total_price
+        #
+        # discount = user.get_discount()
+        #
+        # if discount.in_percent:
+        #     price = self.total_price * ((100 - discount.value) / 100)
+        #     return price if price >= 0 else 0
+        # else:
+        #     price = self.total_price - discount.value
+        #     return price if price >= 0 else 0
+
+    @property
+    def total_incl_discount_incl_shipping(self):
+        return self.total_price_inc_discount + self.shipping_price
 
     def __str__(self):
         return 'Basket {}'.format(self.user.username)

@@ -1,9 +1,11 @@
+import datetime
+
 from flask import url_for
 from flask_login import UserMixin, AnonymousUserMixin
 
-from database import db
-import datetime
 from basket.models import Basket
+from database import db
+from order.models import Discount
 
 
 class User(db.Model, UserMixin):
@@ -23,6 +25,7 @@ class User(db.Model, UserMixin):
     authenticated = db.Column(db.Boolean, default=False)
 
     basket = db.relationship("Basket", backref='basket', lazy='dynamic')
+    discounts = db.relationship("Discount", backref='discount', lazy='dynamic')
 
     def __init__(self, username, email, password):
         super(User, self).__init__()
@@ -62,6 +65,19 @@ class User(db.Model, UserMixin):
             db.session.add(user_basket)
             db.session.commit()
         return user_basket
+
+    @property
+    def discount(self):
+        active_discounts = [x for x in
+                            Discount.query.filter_by(owner_id=self.id) if
+                            x.active]
+        if active_discounts:
+            return active_discounts[0]
+        return None
+
+    def has_discount(self):
+        # TODO: implement discounts
+        return False
 
 
 class AnonymousUser(AnonymousUserMixin):
