@@ -6,7 +6,7 @@
     {{ product.name }}
     {{ product.description }}
     <div class="btn-group cart">
-        <form action="{{ url_for('') }}" method="post">
+        <form action="{{ url_for('basket.basket_add') }}" method="post">
             {{ csrf_token }}
             <input type="text" name="id"
                    value="{{ product.id }}" hidden/>
