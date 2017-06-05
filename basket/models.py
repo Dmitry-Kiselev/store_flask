@@ -25,7 +25,7 @@ class Line(db.Model):
     __tablename__ = "lines"
     id = db.Column(db.Integer, primary_key=True)
     product_id = db.Column(db.Integer, db.ForeignKey('products.id'))
-    quantity = db.Column(db.Integer())
+    quantity = db.Column(db.Integer(), default=1)
     basket_id = db.Column(db.Integer, db.ForeignKey('baskets.id'))
 
     @property
