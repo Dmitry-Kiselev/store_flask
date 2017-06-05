@@ -9,12 +9,14 @@ from database import db
 from extensions import login_manager
 from users.models import User, AnonymousUser
 from users.views import users
+from order.views import orders
 
 
 def configure_blueprints(app):
     app.register_blueprint(users, url_prefix='/auth')
     app.register_blueprint(basket, url_prefix='/basket')
     app.register_blueprint(catalogue, url_prefix='/')
+    app.register_blueprint(orders, url_prefix='/orders')
 
 
 def create_app():
