@@ -1,4 +1,5 @@
 from database import db
+from catalogue.models import Product
 
 
 class Basket(db.Model):
@@ -11,6 +12,10 @@ class Basket(db.Model):
     @property
     def total_price(self):
         return sum([line.line_price for line in self.lines.all()])
+
+    @property
+    def lines_count(self):
+        return self.lines.count()
 
     def __str__(self):
         return 'Basket {}'.format(self.user.username)
@@ -26,6 +31,10 @@ class Line(db.Model):
     @property
     def line_price(self):
         return self.product.price * self.quantity
+
+    @property
+    def product(self):
+        return Product.query.get(self.product_id)
 
     def __str__(self):
         return '{} {}'.format(self.product.name, self.quantity)

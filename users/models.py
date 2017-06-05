@@ -3,6 +3,7 @@ from flask_login import UserMixin, AnonymousUserMixin
 
 from database import db
 import datetime
+from basket.models import Basket
 
 
 class User(db.Model, UserMixin):
@@ -55,7 +56,12 @@ class User(db.Model, UserMixin):
 
     @property
     def get_basket(self):
-        return self.basket.query.filter(is_submitted=False).first()
+        user_basket = self.basket.filter_by(is_submitted=False).first()
+        if not user_basket:
+            user_basket = Basket(user_id=self.id, is_submitted=False)
+            db.session.add(user_basket)
+            db.session.commit()
+        return user_basket
 
 
 class AnonymousUser(AnonymousUserMixin):
