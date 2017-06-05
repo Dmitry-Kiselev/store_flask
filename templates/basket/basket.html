@@ -3,11 +3,33 @@
 {% block title %}Basket{% endblock %}
 
 {% block content %}
-    <ul>
-        {% for line in lines %}
-            <li>
-                <a href="{{ line.product.get_absolute_url() }}">{{ line.product.name }}</a>
-            </li>
-        {% endfor %}
-    </ul>
+    {% from "_formhelpers.html" import render_field %}
+    <table class="table">
+        <tbody>
+        <tr>
+            {% for line in lines %}
+                <td class=>
+                    <a href="{{ line.product.get_absolute_url() }}">{{ line.product.name }}</a>
+                </td>{% endfor %}
+        </tr>
+        <tr>
+            {% for form in forms %}
+                <td>
+                    <form method="post"
+                          action="{{ url_for('basket.update_line') }}">
+                        {{ csrf_token }}
+                        <div class="hidden">
+                            {{ render_field(form.line_id) }}
+                        </div>
+                        {{ render_field(form.quantity) }}
+                        <button class="btn btn-default" type="submit">Update
+                        </button>
+                    </form>
+                </td>
+
+            {% endfor %}
+        </tr>
+        </tbody>
+    </table>
+
 {% endblock %}
