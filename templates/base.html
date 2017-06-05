@@ -36,7 +36,8 @@
                 </div>
 
                 <ul class="nav navbar-nav">
-                    <li><a href="{{ url_for('catalogue.catalogue_view') }}">Catalogue</a></li>
+                    <li><a href="{{ url_for('catalogue.catalogue') }}">Catalogue</a>
+                    </li>
                 </ul>
 
                 <!-- Collect the nav links, forms, and other content for toggling -->
@@ -60,15 +61,14 @@
                                    aria-expanded="false"> {{ current_user.username }}
                                     <span class="caret"></span></a>
                                 <ul class="dropdown-menu">
-                                    {#                                    <li><a href="{{ url_for('basket_index') }}">Basket#}
-                                    {#                                        ({{ basket_lines_count }})</a></li>#}
+                                    <li><a href="{{ url_for('basket.basket_index') }}">Basket({{ basket_lines_count }})</a></li>
                                     {#                                    <li><a href="{{ url_for('edit_profile') }}">Edit#}
                                     {#                                        profile</a></li>#}
                                     <li><a href="{{ url_for('users.logout') }}">Logout</a>
                                     </li>
                                 </ul>
                             </li>
-                            {% else %}
+                        {% else %}
                             <li><a href="{{ url_for('users.login') }}">Log
                                 in</a></li>
                             <li><a href="{{ url_for('users.sign_up') }}">Sing
@@ -78,13 +78,15 @@
                 </div><!-- /.navbar-collapse -->
             </div><!-- /.container-fluid -->
         </nav>
-        {% if messages %}
-            <ul class="messages">
-                {% for message in messages %}
-                    <li class="alert-info {{ message.tags }}">{{ message }}</li>
-                {% endfor %}
-            </ul>
-        {% endif %}
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <ul class=flashes>
+                    {% for message in messages %}
+                        <li class="alert alert-info">{{ message }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        {% endwith %}
     {% endblock %}
     {% block content %}
     {% endblock %}
