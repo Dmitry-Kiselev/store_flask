@@ -14,3 +14,8 @@ class Config(object):
 class DevelopmentConfig(Config):
     DEVELOPMENT = True
     DEBUG = True
+
+
+class PaymentConfig:
+    PAYMENT_SERVICE = 'stripe'
+    STRIPE_API_KEY = 'sk_test_kdrKohTAdfuCZgqCRO8ctkzL'
