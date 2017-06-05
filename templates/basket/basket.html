@@ -32,4 +32,20 @@
         </tbody>
     </table>
 
+                <div class="row">
+                <div class="col-sm-12 col-md-4">
+                    <p>
+                        Total: {{ current_user.get_basket.total_price }}</p>
+                    <p>Total inc
+                        discount: {{ current_user.get_basket.total_price_inc_discount }}</p>
+                    <p>
+                        Shipping: {{ current_user.get_basket.shipping_price }}</p>
+                    <br>
+                    <p>
+                        Total: {{ current_user.get_basket.total_incl_discount_incl_shipping }}</p>
+                </div>
+            </div>
+            <a class="btn-lg btn-success checkout-btn pull-right"
+               href="{{ url_for('orders.checkout') }}" id="checkout_btn">Checkout</a>
+
 {% endblock %}
