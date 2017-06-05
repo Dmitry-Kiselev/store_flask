@@ -2,9 +2,10 @@ from flask import Blueprint, render_template, flash, redirect, url_for
 from flask import request
 from flask.views import MethodView
 from flask_login import current_user
+from sqlalchemy.sql import exists
 
 from database import db
-from .models import Line
+from .models import Line, Basket
 
 basket = Blueprint("basket", __name__)
 
@@ -20,6 +21,9 @@ class BasketAddView(MethodView):
         basket = current_user.get_basket
         if not product_id:
             return 403
+        if db.session.query(exists().where(Line.product_id == product_id).where(
+                        Basket.id == basket.id)).scalar():
+            return redirect(url_for('catalogue.catalogue'))
         line = Line(product_id=product_id, basket_id=basket.id)
         db.session.add(line)
         db.session.commit()
