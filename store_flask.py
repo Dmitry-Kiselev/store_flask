@@ -2,6 +2,7 @@ from flask import Flask
 from flask_bootstrap import Bootstrap
 
 from admin.views import configure_admin_views
+from basket.processors import basket_processor
 from basket.views import basket
 from catalogue.views import catalogue
 from database import db
@@ -43,6 +44,7 @@ def load_user(user_id):
 
 
 login_manager.anonymous_user = AnonymousUser
+app.context_processor(basket_processor)
 
 if __name__ == '__main__':
     app.run(debug=True)
