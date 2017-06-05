@@ -33,8 +33,7 @@ class BasketAddView(MethodView):
         basket = current_user.get_basket
         if not product_id:
             return 403
-        if db.session.query(exists().where(Line.product_id == product_id).where(
-                        Basket.id == basket.id)).scalar():
+        if Line.query.filter_by(product_id=product_id, basket_id=basket.id).count():
             return redirect(url_for('catalogue.catalogue'))
         line = Line(product_id=product_id, basket_id=basket.id)
         db.session.add(line)
@@ -45,7 +44,6 @@ class BasketAddView(MethodView):
 
 class UpdateLineQuantityView(MethodView):
     def post(self):
-        print(request.form)
         line = Line.query.get(request.form.get('line_id'))
         line.quantity = request.form.get('quantity')
         if line.quantity == 0:
