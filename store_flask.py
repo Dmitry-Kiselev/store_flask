@@ -27,8 +27,6 @@ def create_app():
     configure_blueprints(app)
     configure_admin_views(app)
 
-    app.secret_key = 'super secret key'
-
     return app
 
 
