@@ -1,10 +1,12 @@
 from decimal import Decimal
 
 from flask_login import current_user
+from sqlalchemy import event
 
 from catalogue.models import Product
 from config import ShippingConfig
 from database import db
+from extensions import cache
 
 
 class Basket(db.Model):
@@ -75,3 +77,11 @@ class Line(db.Model):
 
     def __str__(self):
         return '{} {}'.format(self.product.name, self.quantity)
+
+
+@event.listens_for(Line, 'after_delete')
+@event.listens_for(Line, 'after_insert')
+def update_cache(mapper, connection, target):
+    key = current_user.get_basket.id
+    count = Line.query.filter(Line.basket_id == key).count()
+    cache.set('basket_{}'.format(key), count, None)
