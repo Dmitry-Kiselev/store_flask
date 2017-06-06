@@ -12,6 +12,8 @@ class Config(object):
     SECRET_KEY = '2sXBwWL5CeyG6ZcFBCe92zrb2LGetNwQ'
     SQLALCHEMY_DATABASE_URI = "postgresql://store:store@localhost/store"
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+    ELASTICSEARCH_HOST = "http://localhost:9200/"
+
 
 class DevelopmentConfig(Config):
     DEVELOPMENT = True

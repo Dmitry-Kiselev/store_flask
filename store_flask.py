@@ -7,9 +7,10 @@ from basket.views import basket
 from catalogue.views import catalogue
 from database import db
 from extensions import login_manager
+from order.views import orders
+from search.views import search
 from users.models import User, AnonymousUser
 from users.views import users
-from order.views import orders
 
 
 def configure_blueprints(app):
@@ -17,6 +18,7 @@ def configure_blueprints(app):
     app.register_blueprint(basket, url_prefix='/basket')
     app.register_blueprint(catalogue, url_prefix='/')
     app.register_blueprint(orders, url_prefix='/orders')
+    app.register_blueprint(search, url_prefix='/search')
 
 
 def create_app():
