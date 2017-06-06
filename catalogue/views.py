@@ -1,21 +1,25 @@
 from flask import Blueprint, render_template
 
+from extensions import cache
 from .models import Category, Product
 
 catalogue = Blueprint("catalogue", __name__)
 
 
+@cache.cached(timeout=50)
 def index():
     return render_template('catalogue/index.html',
                            categories=Category.query.all(),
                            products=Product.query.all())
 
 
+@cache.cached(timeout=50)
 def catalogue_view():
     return render_template('catalogue/catalogue.html',
                            products=Product.query.all())
 
 
+@cache.cached(timeout=50)
 def product_detail(product_id):
     return render_template('catalogue/product_detail.html',
                            product=Product.query.get(product_id))
