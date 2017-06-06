@@ -107,7 +107,8 @@ class User(db.Model, UserMixin):
     def has_discount(self):
         now = datetime.datetime.now()
         return Discount.query.filter(Discount.available_from <= now,
-                                     Discount.available_until >= now).count()
+                                     Discount.available_until >= now,
+                                     Discount.owner_id == self.id).count()
 
     def set_password(self, password):
         self.password = hashlib.md5(password.encode()).hexdigest()

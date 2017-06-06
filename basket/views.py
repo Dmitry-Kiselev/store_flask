@@ -2,11 +2,10 @@ from flask import Blueprint, render_template, flash, redirect, url_for
 from flask import request
 from flask.views import MethodView, View
 from flask_login import current_user
-from sqlalchemy.sql import exists
 
 from database import db
 from .forms import LineForm
-from .models import Line, Basket
+from .models import Line
 
 basket = Blueprint("basket", __name__)
 
@@ -33,7 +32,8 @@ class BasketAddView(MethodView):
         basket = current_user.get_basket
         if not product_id:
             return 403
-        if Line.query.filter_by(product_id=product_id, basket_id=basket.id).count():
+        if Line.query.filter_by(product_id=product_id,
+                                basket_id=basket.id).count():
             return redirect(url_for('catalogue.catalogue'))
         line = Line(product_id=product_id, basket_id=basket.id)
         db.session.add(line)
@@ -46,7 +46,7 @@ class UpdateLineQuantityView(MethodView):
     def post(self):
         line = Line.query.get(request.form.get('line_id'))
         line.quantity = request.form.get('quantity')
-        if line.quantity == 0:
+        if line.quantity == '0':
             db.session.delete(line)
         db.session.commit()
         return redirect(url_for('basket.basket_index'))
