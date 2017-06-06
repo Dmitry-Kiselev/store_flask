@@ -49,4 +49,4 @@ login_manager.anonymous_user = AnonymousUser
 app.context_processor(basket_processor)
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run()
