@@ -11,7 +11,7 @@ class Config(object):
     CSRF_ENABLED = True
     SECRET_KEY = '2sXBwWL5CeyG6ZcFBCe92zrb2LGetNwQ'
     SQLALCHEMY_DATABASE_URI = "postgresql://store:store@localhost/store"
-
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
 
 class DevelopmentConfig(Config):
     DEVELOPMENT = True
