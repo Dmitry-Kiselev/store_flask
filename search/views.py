@@ -13,7 +13,6 @@ class SearchView(View):
         es = ElasticSearch(Config.ELASTICSEARCH_HOST)
         q = request.args['q']
         result = es.search('name:{}'.format(q), index='catalogue')
-        print(result)
         num_results = result['hits']['total']
         product_ids = [hit['_id'] for hit in result['hits']['hits']]
         products = Product.query.filter(Product.id.in_(product_ids))
