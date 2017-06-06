@@ -34,7 +34,7 @@ class User(db.Model, UserMixin):
         super(User, self).__init__()
         self.username = username
         self.email = email
-        self.password = self.set_password(password)
+        self.set_password(password)
 
     def is_active(self):
         """True, as all users are active."""
@@ -110,10 +110,10 @@ class User(db.Model, UserMixin):
                                      Discount.available_until >= now).count()
 
     def set_password(self, password):
-        self.password = hashlib.md5(password.encode())
+        self.password = hashlib.md5(password.encode()).hexdigest()
 
     def check_password(self, password):
-        return self.password == hashlib.md5(password.encode())
+        return self.password == hashlib.md5(password.encode()).hexdigest()
 
 
 class AnonymousUser(AnonymousUserMixin):
