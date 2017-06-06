@@ -6,7 +6,7 @@ from basket.processors import basket_processor
 from basket.views import basket
 from catalogue.views import catalogue
 from database import db
-from extensions import login_manager
+from extensions import login_manager, cache
 from order.views import orders
 from search.views import search
 from users.models import User, AnonymousUser
@@ -26,6 +26,7 @@ def create_app():
     app.config.from_object('config.DevelopmentConfig')
     db.init_app(app)
     login_manager.init_app(app)
+    cache.init_app(app)
     Bootstrap(app)
     configure_blueprints(app)
     configure_admin_views(app)
