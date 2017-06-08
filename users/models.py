@@ -7,6 +7,7 @@ from flask_login import AnonymousUserMixin
 from basket.models import Basket
 from config import ShippingConfig
 from database import db
+from order.models import Discount
 
 
 class User(db.Document):
@@ -19,9 +20,6 @@ class User(db.Document):
     address_lng = db.FloatField(required=False)
 
     authenticated = db.BooleanField(default=False)
-
-    basket = db.ReferenceField("Basket")
-    discounts = db.ReferenceField("Discount")
 
     def save(self, *args, **kwargs):
         if not self.id:
@@ -55,17 +53,17 @@ class User(db.Document):
 
     @property
     def get_basket(self):
-        if self.basket is not None:
-            user_basket = self.basket.filter(is_submitted=False).first()
-            if user_basket:
-                return user_basket
-        user_basket = Basket(user=self, is_submitted=False)
-        user_basket.save()
+        try:
+            user_basket = Basket.objects.filter(is_submitted=False,
+                                                user=self).first()
+        except Basket.DoesNotExists:
+            user_basket = Basket(user=self, is_submitted=False)
+            user_basket.save()
         return user_basket
 
     @property
     def discount(self):
-        return self.discounts.objects.active.first()
+        return Discount.objects.active().filter(owner=self).first()
 
     @property
     def distance(self):

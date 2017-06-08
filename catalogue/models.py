@@ -25,10 +25,13 @@ class Category(TimeStampedModel):
     parent = db.ReferenceField("Category", required=False)
     left = db.ReferenceField("Category", required=False)
     right = db.ReferenceField("Category", required=False)
-    products = db.ReferenceField("Discount", required=False)
 
     def __str__(self):
         return '<Category {}>'.format(self.name)
+
+    @property
+    def products(self):
+        return Product.objects.filter(category=self)
 
 
 class Product(TimeStampedModel):

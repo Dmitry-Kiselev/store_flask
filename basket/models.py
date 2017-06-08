@@ -9,7 +9,10 @@ from database import db
 class Basket(db.Document):
     user = db.ReferenceField("User")
     is_submitted = db.BooleanField()
-    lines = db.ReferenceField("Line")
+
+    @property
+    def lines(self):
+        return Line.objects.filter(basket=self)
 
     @property
     def total_price(self):
@@ -56,7 +59,7 @@ class Basket(db.Document):
 
 
 class Line(db.Document):
-    product_ = db.ReferenceField("Product")
+    product = db.ReferenceField("Product")
     quantity = db.IntField(default=1)
     basket = db.ReferenceField("Basket")
 
