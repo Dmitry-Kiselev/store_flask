@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <form action="{{ request.path }}" method="get">
+        <select name="level" id="level">
+            <option value="info">Info</option>
+            <option value="debug">Debug</option>
+            <option value="error">Error</option>
+        </select>
+        <label for="level">Select level:</label>
+        <button type="submit">Submit</button>
+    </form>
+    <ul>
+        {% for log in logs %}
+            <li>
+                {{ log.time }} - {{ log.file }}: {{ log.message }}
+                ({{ log.level }})
+            </li>
+        {% endfor %}
+    </ul>
+{% endblock %}
