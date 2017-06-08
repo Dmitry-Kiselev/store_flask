@@ -13,7 +13,7 @@ basket = Blueprint("basket", __name__)
 
 class IndexView(View):
     def get_lines(self):
-        self.lines = current_user.get_basket.lines.objects.all()
+        self.lines = current_user.get_basket.lines
 
     def get_forms(self):
         self.forms = [LineForm(
@@ -47,12 +47,14 @@ class BasketAddView(MethodView):
 class UpdateLineQuantityView(MethodView):
     def post(self):
         try:
-            line = Line.objects.get(request.form.get('line_id'))
+            line = Line.objects.get(id=request.form.get('line_id'))
         except DoesNotExist:
             return 404
         line.quantity = request.form.get('quantity')
         if line.quantity == '0':
             line.delete()
+        else:
+            line.save()
         return redirect(url_for('basket.basket_index'))
 
 
