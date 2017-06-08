@@ -4,6 +4,7 @@ from flask import Flask
 from flask_bootstrap import Bootstrap
 
 from _logging.handlers import MongoLogger
+from _logging.views import logs
 from admin.views import configure_admin_views
 from basket.processors import basket_processor
 from basket.views import basket
@@ -24,6 +25,7 @@ def configure_blueprints(app):
     app.register_blueprint(catalogue, url_prefix='/')
     app.register_blueprint(orders, url_prefix='/orders')
     app.register_blueprint(search, url_prefix='/search')
+    app.register_blueprint(logs, url_prefix='/logs')
 
 
 def create_app():
