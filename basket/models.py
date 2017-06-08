@@ -16,7 +16,7 @@ class Basket(db.Document):
 
     @property
     def total_price(self):
-        return sum([line.line_price for line in self.objects.all()])
+        return sum([line.line_price for line in self.lines])
 
     @property
     def lines_count(self):

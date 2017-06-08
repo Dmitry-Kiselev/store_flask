@@ -58,7 +58,7 @@ class DiscountQuerySet(QuerySet):
     def active(self):
         now = datetime.datetime.now()
         return self.filter(
-            self.available_from <= now and self.available_until >= now)
+            available_from__lte=now, available_until__gte=now)
 
 
 class Discount(db.Document):

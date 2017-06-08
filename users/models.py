@@ -53,10 +53,9 @@ class User(db.Document):
 
     @property
     def get_basket(self):
-        try:
-            user_basket = Basket.objects.filter(is_submitted=False,
-                                                user=self).first()
-        except Basket.DoesNotExists:
+        user_basket = Basket.objects.filter(is_submitted=False,
+                                            user=self).first()
+        if user_basket is None:
             user_basket = Basket(user=self, is_submitted=False)
             user_basket.save()
         return user_basket
@@ -92,7 +91,7 @@ class User(db.Document):
         return distance
 
     def has_discount(self):
-        return self.discounts.objects.active.exists()
+        return Discount.objects.active().filter(owner=self).count()
 
     def generate_password(self, password):
         return hashlib.md5(password.encode()).hexdigest()

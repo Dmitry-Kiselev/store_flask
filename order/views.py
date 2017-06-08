@@ -23,7 +23,7 @@ class OrderCreateView(MethodView):
         form = self.form_class(request.form)
         if form.validate():
             basket = current_user.get_basket
-            order = Order(basket_id=basket, discount=current_user.discount)
+            order = Order(basket=basket, discount=current_user.discount)
             basket.submit()
 
             basket.save()
