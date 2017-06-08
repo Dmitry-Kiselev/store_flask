@@ -1,6 +1,9 @@
+import logging
+
 from flask import Flask
 from flask_bootstrap import Bootstrap
 
+from _logging.handlers import MongoLogger
 from admin.views import configure_admin_views
 from basket.processors import basket_processor
 from basket.views import basket
@@ -11,6 +14,8 @@ from order.views import orders
 from search.views import search
 from users.models import User, AnonymousUser
 from users.views import users
+
+logger = logging.getLogger('werkzeug')
 
 
 def configure_blueprints(app):
@@ -50,4 +55,9 @@ login_manager.anonymous_user = AnonymousUser
 app.context_processor(basket_processor)
 
 if __name__ == '__main__':
+    access_handler = MongoLogger()
+
+    logger.addHandler(access_handler)
+    app._logger = logger
+
     app.run()
