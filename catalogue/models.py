@@ -14,7 +14,7 @@ class TimeStampedModel(db.Document):
     updated_on = db.DateTimeField()
 
     def save(self, *args, **kwargs):
-        if not self.creation_date:
+        if not self.created_on:
             self.created_on = datetime.datetime.now()
         self.updated_on = datetime.datetime.now()
         return super(TimeStampedModel, self).save(*args, **kwargs)
