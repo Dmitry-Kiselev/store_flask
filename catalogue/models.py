@@ -34,10 +34,24 @@ class Category(TimeStampedModel):
         return Product.objects.filter(category=self)
 
 
+class ProductAttribute(db.Document):
+    name = db.StringField(max_length=30)
+    category = db.ReferenceField("Category", required=True)
+
+    def __str__(self):
+        return self.name
+
+
+class ProductAttributeValue(db.EmbeddedDocument):
+    attribute = db.ReferenceField("ProductAttribute", required=True)
+    value = db.StringField(max_length=30)
+
+
 class Product(TimeStampedModel):
     category = db.ReferenceField("Category", required=True)
     name = db.StringField(max_length=120, required=True)
     description = db.StringField(max_length=120, required=False)
+    attributes = db.EmbeddedDocumentField(ProductAttributeValue)
     price = db.DecimalField()
     num_in_stock = db.IntField()
 
