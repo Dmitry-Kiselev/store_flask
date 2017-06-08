@@ -55,7 +55,7 @@ class Order(db.Document):
 
 
 class DiscountQuerySet(QuerySet):
-    def get_awesome(self):
+    def active(self):
         now = datetime.datetime.now()
         return self.filter(
             self.available_from <= now and self.available_until >= now)
