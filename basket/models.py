@@ -1,28 +1,23 @@
 from decimal import Decimal
 
 from flask_login import current_user
-from sqlalchemy import event
 
-from catalogue.models import Product
 from config import ShippingConfig
 from database import db
-from extensions import cache
 
 
-class Basket(db.Model):
-    __tablename__ = "baskets"
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
-    is_submitted = db.Column(db.Boolean())
-    lines = db.relationship("Line", backref='line', lazy='dynamic')
+class Basket(db.Document):
+    user = db.ReferenceField("User")
+    is_submitted = db.BooleanField()
+    lines = db.ReferenceField("Line")
 
     @property
     def total_price(self):
-        return sum([line.line_price for line in self.lines.all()])
+        return sum([line.line_price for line in self.objects.all()])
 
     @property
     def lines_count(self):
-        return self.lines.count()
+        return self.lines.objects.count()
 
     def submit(self):
         self.is_submitted = True
@@ -60,28 +55,21 @@ class Basket(db.Model):
         return 'Basket {}'.format(self.id)
 
 
-class Line(db.Model):
-    __tablename__ = "lines"
-    id = db.Column(db.Integer, primary_key=True)
-    product_id = db.Column(db.Integer, db.ForeignKey('products.id'))
-    quantity = db.Column(db.Integer(), default=1)
-    basket_id = db.Column(db.Integer, db.ForeignKey('baskets.id'))
+class Line(db.Document):
+    product_ = db.ReferenceField("Product")
+    quantity = db.IntField(default=1)
+    basket = db.ReferenceField("Basket")
 
     @property
     def line_price(self):
         return self.product.price * self.quantity
 
-    @property
-    def product(self):
-        return Product.query.get(self.product_id)
-
     def __str__(self):
         return '{} {}'.format(self.product.name, self.quantity)
 
-
-@event.listens_for(Line, 'after_delete')
-@event.listens_for(Line, 'after_insert')
-def update_cache(mapper, connection, target):
-    key = current_user.get_basket.id
-    count = Line.query.filter(Line.basket_id == key).count()
-    cache.set('basket_{}'.format(key), count, None)
+# @event.listens_for(Line, 'after_delete')
+# @event.listens_for(Line, 'after_insert')
+# def update_cache(mapper, connection, target):
+#     key = current_user.get_basket.id
+#     count = Line.query.filter(Line.basket_id == key).count()
+#     cache.set('basket_{}'.format(key), count, None)

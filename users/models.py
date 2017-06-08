@@ -1,40 +1,33 @@
-import datetime
 import hashlib
 from math import radians, sin, cos, atan2, sqrt
 
 from flask import url_for
-from flask_login import UserMixin, AnonymousUserMixin
+from flask_login import AnonymousUserMixin
 
 from basket.models import Basket
 from config import ShippingConfig
 from database import db
-from order.models import Discount
 
 
-class User(db.Model, UserMixin):
-    __tablename__ = "users"
+class User(db.Document):
+    username = db.StringField(max_length=120, required=True)
+    email = db.StringField(required=True)
+    password = db.StringField(max_length=50)
+    date_joined = db.DateTimeField()
+    address = db.StringField(max_length=100, required=False)
+    address_lat = db.FloatField(required=False)
+    address_lng = db.FloatField(required=False)
 
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(200), unique=True, nullable=False)
-    email = db.Column(db.String(200), unique=True, nullable=False)
-    password = db.Column('password', db.String(120), nullable=False)
-    date_joined = db.Column(db.DateTime(timezone=True),
-                            default=datetime.datetime.now,
-                            nullable=False)
-    address = db.Column(db.String(100), nullable=True)
-    address_lat = db.Column(db.Float, nullable=True)
-    address_lng = db.Column(db.Float, nullable=True)
+    authenticated = db.BooleanField(default=False)
 
-    authenticated = db.Column(db.Boolean, default=False)
+    basket = db.ReferenceField("Basket")
+    discounts = db.ReferenceField("Discount")
 
-    basket = db.relationship("Basket", backref='basket', lazy='dynamic')
-    discounts = db.relationship("Discount", backref='discount', lazy='dynamic')
-
-    def __init__(self, username, email, password):
-        super(User, self).__init__()
-        self.username = username
-        self.email = email
-        self.set_password(password)
+    def save(self, *args, **kwargs):
+        if not self.id:
+            self.set_password(self.password)
+            self.id = str(self.id)
+        super(User, self).save(*args, **kwargs)
 
     def is_active(self):
         """True, as all users are active."""
@@ -42,7 +35,7 @@ class User(db.Model, UserMixin):
 
     def get_id(self):
         """Return the email address to satisfy Flask-Login's requirements."""
-        return self.id
+        return str(self.id)
 
     def is_authenticated(self):
         """Return True if the user is authenticated."""
@@ -62,21 +55,17 @@ class User(db.Model, UserMixin):
 
     @property
     def get_basket(self):
-        user_basket = self.basket.filter_by(is_submitted=False).first()
-        if not user_basket:
-            user_basket = Basket(user_id=self.id, is_submitted=False)
-            db.session.add(user_basket)
-            db.session.commit()
+        if self.basket is not None:
+            user_basket = self.basket.filter(is_submitted=False).first()
+            if user_basket:
+                return user_basket
+        user_basket = Basket(user=self, is_submitted=False)
+        user_basket.save()
         return user_basket
 
     @property
     def discount(self):
-        active_discounts = [x for x in
-                            self.discounts if
-                            x.is_active()]
-        if active_discounts:
-            return active_discounts[0]
-        return None
+        return self.discounts.objects.active.first()
 
     @property
     def distance(self):
@@ -105,13 +94,10 @@ class User(db.Model, UserMixin):
         return distance
 
     def has_discount(self):
-        now = datetime.datetime.now()
-        return Discount.query.filter(Discount.available_from <= now,
-                                     Discount.available_until >= now,
-                                     Discount.owner_id == self.id).count()
+        return self.discounts.objects.active.exists()
 
-    def set_password(self, password):
-        self.password = hashlib.md5(password.encode()).hexdigest()
+    def generate_password(self, password):
+        return hashlib.md5(password.encode()).hexdigest()
 
     def check_password(self, password):
         return self.password == hashlib.md5(password.encode()).hexdigest()

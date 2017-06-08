@@ -15,7 +15,7 @@ class SearchView(View):
         result = es.search('name:{}'.format(q), index='catalogue')
         num_results = result['hits']['total']
         product_ids = [hit['_id'] for hit in result['hits']['hits']]
-        products = Product.query.filter(Product.id.in_(product_ids))
+        products = Product.objects.filter(id__in=product_ids)
         return render_template('search/search.html', num_results=num_results,
                                products=products, q=q)
 

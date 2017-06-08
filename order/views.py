@@ -3,7 +3,6 @@ from flask.views import MethodView
 from flask_login import current_user
 from stripe import InvalidRequestError
 
-from database import db
 from order.models import Order
 from payment.forms import PaymentForm
 from payment.models import Payment
@@ -24,12 +23,10 @@ class OrderCreateView(MethodView):
         form = self.form_class(request.form)
         if form.validate():
             basket = current_user.get_basket
-            discount_id = current_user.discount.id if current_user.discount else None
-            order = Order(basket_id=basket.id, discount_id=discount_id)
+            order = Order(basket_id=basket, discount=current_user.discount)
             basket.submit()
 
-            db.session.add(order)
-            db.session.commit()
+            basket.save()
 
             number = form.number.data
             exp_month = form.expiration_month.data
@@ -45,9 +42,8 @@ class OrderCreateView(MethodView):
                 flash(
                     'Some error happened during checkout process. Please, try again later')
 
-            payment = Payment(charge_id=charge_id, order_id=order.id)
-            db.session.add(payment)
-            db.session.commit()
+            payment = Payment(charge_id=charge_id, order=order)
+            payment.save()
             flash(
                 'Thanks for your order!')
             return redirect('/')

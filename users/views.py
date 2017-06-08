@@ -2,7 +2,6 @@ from flask import render_template, request, flash, redirect, url_for, Blueprint
 from flask.views import MethodView
 from flask_login import login_required, current_user, logout_user, login_user
 
-from database import db
 from users.models import User
 from .forms import RegistrationForm, UserLoginForm, UserProfileForm
 
@@ -20,10 +19,9 @@ class UserRegistrationView(MethodView):
     def post(self):
         form = self.form_class(request.form)
         if form.validate():
-            user = User(form.username.data, form.email.data,
-                        form.password.data)
-            db.session.add(user)
-            db.session.commit()
+            user = User(username=form.username.data, email=form.email.data,
+                        password=form.password.data)
+            user.save()
             flash('Thanks for registering')
             return redirect(url_for('users.login'))
         return render_template(self.template_name, form=form)
@@ -40,12 +38,11 @@ class UserLoginView(MethodView):
     def post(self):
         form = self.form_class(request.form)
         if form.validate():
-            user = User.query.filter_by(username=form.username.data).first()
+            user = User.objects.get(username=form.username.data)
             if user:
                 if user.check_password(form.password.data):
                     user.authenticated = True
-                    db.session.add(user)
-                    db.session.commit()
+                    user.save()
                     login_user(user, remember=True)
                     return redirect('/')
         return render_template(self.template_name, form=form)
@@ -65,7 +62,7 @@ class UserProfileView(MethodView):
             current_user.address = form.address.data
             current_user.address_lat = form.address_lat.data
             current_user.address_lng = form.address_lng.data
-            db.session.commit()
+            current_user.save()
             flash('Profile updated')
             return redirect('/')
         return render_template(self.template_name, form=form)
@@ -76,8 +73,7 @@ def logout():
     """Logout the current user."""
     user = current_user
     user.authenticated = False
-    db.session.add(user)
-    db.session.commit()
+    user.save()
     logout_user()
     return redirect('/')
 

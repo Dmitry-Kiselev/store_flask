@@ -1,13 +1,12 @@
 import datetime
 from decimal import Decimal
 
-from sqlalchemy_utils.types.choice import ChoiceType
+from mongoengine import QuerySet
 
-from basket.models import Basket
 from database import db
 
 
-class Order(db.Model):
+class Order(db.Document):
     class ORDER_STATUS:
         PENDING = 0
         FAILED = 1
@@ -21,61 +20,55 @@ class Order(db.Model):
             (COMPLETED, 'Completed')
         )
 
-    __tablename__ = "orders"
-    id = db.Column(db.Integer, primary_key=True)
-    basket_id = db.Column(db.Integer, db.ForeignKey('baskets.id'))
-    status = db.Column(db.SmallInteger, ChoiceType(ORDER_STATUS.STATUS_CHOICES),
-                       default=ORDER_STATUS.PENDING)
-    discount_id = db.Column(db.Integer, db.ForeignKey('discounts.id'),
-                            nullable=True)
-
-    def __init__(self, basket_id, discount_id):
-        self.basket_id = basket_id
-        self.discount_id = discount_id
+    basket = db.ReferenceField('Basket')
+    status = db.IntField(choices=ORDER_STATUS.STATUS_CHOICES,
+                         default=ORDER_STATUS.PENDING)
+    discount = db.ReferenceField('Basket', required=False)
 
     @property
     def total_price(self):
-        basket = Basket.query.get(self.basket_id)
-        shipping_price = basket.shipping_price
-        if not self.discount_id:
-            return basket.total_price + Decimal(shipping_price)
-        discount = Discount.query.get(self.discount_id)
+        shipping_price = self.basket.shipping_price
+        if not self.discount:
+            return self.basket.total_price + Decimal(shipping_price)
 
-        if discount.in_percent:
-            return basket.total_price * (
-                (100 - discount.value) / 100) + shipping_price
+        if self.discount.in_percent:
+            return self.basket.total_price * (
+                (100 - self.discount.value) / 100) + shipping_price
         else:
-            return basket.total_price - discount.value + Decimal(shipping_price)
+            return self.basket.total_price - self.discount.value + Decimal(
+                shipping_price)
 
     @property
     def get_discount_val(self):
-        if not self.discount_id:
+        if not self.discount:
             return 0
-        discount = Discount.query.get(self.discount_id)
-        basket = Basket.query.get(self.basket_id)
-        if discount.in_percent:
-            return basket.total_price - (
-                basket.total_price * Decimal((100 - discount.value) / 100))
+        if self.discount.in_percent:
+            return self.basket.total_price - (
+                self.basket.total_price * Decimal(
+                    (100 - self.discount.value) / 100))
         else:
-            return basket.total_price - (
-                basket.total_price - discount.value)
+            return self.basket.total_price - (
+                self.basket.total_price - self.discount.value)
 
     def get_status(self):
         return dict(Order.ORDER_STATUS.STATUS_CHOICES)[self.status]
 
 
-class Discount(db.Model):
-    __tablename__ = "discounts"
-    id = db.Column(db.Integer, primary_key=True)
-    owner_id = db.Column(db.Integer, db.ForeignKey('users.id'))
-    value = db.Column(db.DECIMAL)
-    in_percent = db.Column(db.Boolean, default=False)
-    available_from = db.Column(db.DateTime)
-    available_until = db.Column(db.DateTime)
-
-    def is_active(self):
+class DiscountQuerySet(QuerySet):
+    def get_awesome(self):
         now = datetime.datetime.now()
-        return self.available_from <= now and self.available_until >= now
+        return self.filter(
+            self.available_from <= now and self.available_until >= now)
+
+
+class Discount(db.Document):
+    meta = {'queryset_class': DiscountQuerySet}
+
+    owner = db.ReferenceField('User')
+    value = db.DecimalField()
+    in_percent = db.BooleanField(default=False)
+    available_from = db.DateTimeField()
+    available_until = db.DateTimeField()
 
     def mark_as_used(self):
         self.is_used = True

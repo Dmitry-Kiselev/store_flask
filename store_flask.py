@@ -39,7 +39,7 @@ app = create_app()
 
 @login_manager.user_loader
 def load_user(user_id):
-    user_instance = User.query.filter_by(id=user_id).first()
+    user_instance = User.objects.get(id=user_id)
     if user_instance:
         return user_instance
     else:

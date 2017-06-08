@@ -2,8 +2,9 @@ from flask import Blueprint, render_template, flash, redirect, url_for
 from flask import request
 from flask.views import MethodView, View
 from flask_login import current_user
+from mongoengine.errors import DoesNotExist
 
-from database import db
+from catalogue.models import Product
 from .forms import LineForm
 from .models import Line
 
@@ -12,7 +13,7 @@ basket = Blueprint("basket", __name__)
 
 class IndexView(View):
     def get_lines(self):
-        self.lines = current_user.get_basket.lines.all()
+        self.lines = current_user.get_basket.lines.objects.all()
 
     def get_forms(self):
         self.forms = [LineForm(
@@ -29,26 +30,29 @@ class IndexView(View):
 class BasketAddView(MethodView):
     def post(self):
         product_id = request.form.get('id')
+        try:
+            product = Product.objects.get(id=product_id)
+        except DoesNotExist:
+            return 404
         basket = current_user.get_basket
-        if not product_id:
-            return 403
-        if Line.query.filter_by(product_id=product_id,
-                                basket_id=basket.id).count():
+        if Line.objects.filter(product=product,
+                               basket=basket).count():
             return redirect(url_for('catalogue.catalogue'))
-        line = Line(product_id=product_id, basket_id=basket.id)
-        db.session.add(line)
-        db.session.commit()
+        line = Line(product=product_id, basket=basket.id)
+        line.save()
         flash('Added')
         return redirect(url_for('catalogue.catalogue'))
 
 
 class UpdateLineQuantityView(MethodView):
     def post(self):
-        line = Line.query.get(request.form.get('line_id'))
+        try:
+            line = Line.objects.get(request.form.get('line_id'))
+        except DoesNotExist:
+            return 404
         line.quantity = request.form.get('quantity')
         if line.quantity == '0':
-            db.session.delete(line)
-        db.session.commit()
+            line.delete()
         return redirect(url_for('basket.basket_index'))
 
 

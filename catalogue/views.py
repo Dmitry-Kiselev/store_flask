@@ -9,20 +9,20 @@ catalogue = Blueprint("catalogue", __name__)
 @cache.cached(timeout=50)
 def index():
     return render_template('catalogue/index.html',
-                           categories=Category.query.all(),
-                           products=Product.query.all())
+                           categories=Category.objects.all(),
+                           products=Product.objects.all())
 
 
 @cache.cached(timeout=50)
 def catalogue_view():
     return render_template('catalogue/catalogue.html',
-                           products=Product.query.all())
+                           products=Product.objects.all())
 
 
 @cache.cached(timeout=50)
 def product_detail(product_id):
     return render_template('catalogue/product_detail.html',
-                           product=Product.query.get(product_id))
+                           product=Product.objects.get(id=product_id))
 
 
 catalogue.add_url_rule('/', 'index', index)

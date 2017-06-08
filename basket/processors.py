@@ -4,7 +4,7 @@ from extensions import cache
 
 
 def basket_processor():
-    if not current_user.is_authenticated():
+    if not current_user.is_authenticated:
         return {}
     try:
         key = current_user.get_basket.id
