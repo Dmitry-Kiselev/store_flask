@@ -14,7 +14,7 @@
             <li>
                 {{ log.time }}
                 - {{ log.file or log.url }}: {{ log.message or log.method }}
-                ({{ log.host or traceback }})
+                ({{ log.host or log.traceback }})
             </li>
         {% endfor %}
     </ul>
