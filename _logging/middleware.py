@@ -12,5 +12,7 @@ class LoggingMiddleware:
                                           method=environ[
                                               'werkzeug.request'].method,
                                           host=environ[
-                                              'werkzeug.request'].host))
+                                              'werkzeug.request'].host,
+                                          user_ip=environ[
+                                              'REMOTE_ADDR']))
         return self.app(environ, start_response)

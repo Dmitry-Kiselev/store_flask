@@ -14,5 +14,6 @@ class MongoLogger(Handler):
             log.save()
         elif record.msg == 'request':
             log = LogRecord(time=datetime.datetime.now(), url=record.url,
-                            method=record.method, host=record.host)
+                            method=record.method, host=record.host,
+                            user_ip=record.user_ip)
             log.save()

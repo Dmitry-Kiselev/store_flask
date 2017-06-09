@@ -12,7 +12,7 @@
     <ul>
         {% for log in logs %}
             <li>
-                {{ log.time }}
+                {{ log.time }} {{ log.user_ip }}
                 - {{ log.file or log.url }}: {{ log.message or log.method }}
                 ({{ log.host or log.traceback }})
             </li>
