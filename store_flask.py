@@ -4,6 +4,7 @@ from flask import Flask
 from flask_bootstrap import Bootstrap
 
 from _logging.handlers import MongoLogger
+from _logging.middleware import LiggingMiddleware
 from _logging.views import logs
 from admin.views import configure_admin_views
 from basket.processors import basket_processor
@@ -38,6 +39,13 @@ def create_app():
     configure_blueprints(app)
     configure_admin_views(app)
 
+    app.wsgi_app = LiggingMiddleware(app.wsgi_app)
+
+    access_handler = MongoLogger()
+
+    logger.addHandler(access_handler)
+    app._logger = logger
+
     return app
 
 
@@ -57,9 +65,4 @@ login_manager.anonymous_user = AnonymousUser
 app.context_processor(basket_processor)
 
 if __name__ == '__main__':
-    access_handler = MongoLogger()
-
-    logger.addHandler(access_handler)
-    app._logger = logger
-
     app.run()

@@ -1,7 +1,7 @@
 from flask import render_template, request, Blueprint
 from flask.views import View
 
-from .models import LogRecord
+from .models import LogRecord, LogRecordError
 
 logs = Blueprint("logs", __name__)
 
@@ -9,8 +9,8 @@ logs = Blueprint("logs", __name__)
 class LogView(View):
     def dispatch_request(self):
         l = request.args.get('level')
-        if l:
-            logs = LogRecord.objects.filter(level=l.upper())
+        if l == 'error':
+            logs = LogRecordError.objects.all()
         else:
             logs = LogRecord.objects.all()
         return render_template('logging/log.html', logs=logs, l=l)

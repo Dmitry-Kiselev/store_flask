@@ -4,7 +4,6 @@
     <form action="{{ request.path }}" method="get">
         <select name="level" id="level">
             <option value="info">Info</option>
-            <option value="debug">Debug</option>
             <option value="error">Error</option>
         </select>
         <label for="level">Select level:</label>
@@ -13,8 +12,9 @@
     <ul>
         {% for log in logs %}
             <li>
-                {{ log.time }} - {{ log.file }}: {{ log.message }}
-                ({{ log.level }})
+                {{ log.time }}
+                - {{ log.file or log.url }}: {{ log.message or log.method }}
+                ({{ log.host or traceback }})
             </li>
         {% endfor %}
     </ul>
