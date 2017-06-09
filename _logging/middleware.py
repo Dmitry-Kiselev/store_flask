@@ -3,7 +3,7 @@ import logging
 logger = logging.getLogger('werkzeug')
 
 
-class LiggingMiddleware:
+class LoggingMiddleware:
     def __init__(self, app):
         self.app = app
 

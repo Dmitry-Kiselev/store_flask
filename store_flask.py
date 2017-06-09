@@ -4,7 +4,7 @@ from flask import Flask
 from flask_bootstrap import Bootstrap
 
 from _logging.handlers import MongoLogger
-from _logging.middleware import LiggingMiddleware
+from _logging.middleware import LoggingMiddleware
 from _logging.views import logs
 from admin.views import configure_admin_views
 from basket.processors import basket_processor
@@ -39,7 +39,7 @@ def create_app():
     configure_blueprints(app)
     configure_admin_views(app)
 
-    app.wsgi_app = LiggingMiddleware(app.wsgi_app)
+    app.wsgi_app = LoggingMiddleware(app.wsgi_app)
 
     access_handler = MongoLogger()
 
