@@ -29,7 +29,7 @@ itsdangerous==0.24
 jedi==0.10.2
 Jinja2==2.9.6
 kombu==4.0.2
-Mako==1.0.6
+Mako==1.2.2
 MarkupSafe==1.0
 pexpect==4.2.1
 pickleshare==0.7.4
